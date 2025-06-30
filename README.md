@@ -10,5 +10,5 @@ This script is used to test functionality with sample data in github repository
 ### Wind Capex to SQL.py
 This script writes data directly to SQL databse
 
-### Sample Data
+### Sample Data Folder
 Contains sample data that is read into "Wind Capex Sample.py"
