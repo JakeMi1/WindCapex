@@ -2,16 +2,16 @@ import os
 from datetime import datetime
 import pandas as pd
 
-# -------------RENAME OUTPUT FOLDER WITH DESIRED PATH---------------
+# ------------------FILE PATH PROMPT--------------------
 
-output_folder = "C:/Users/i29784/OneDrive - Wood Mackenzie Limited/Documents/RACM python test/OUT"
+output_path = input("Enter the file path you'd like to export to: ")
 
-#-------------------------------------------------------------------
+#-------------------------------------------------------
 
 # Configuration
 input_file = "https://raw.githubusercontent.com/JakeMi1/WindCapex/refs/heads/main/Sample%20Data/Raw/RACM_Wind_CAPEX_sampledata.csv"
 exchange_rates = "https://raw.githubusercontent.com/JakeMi1/WindCapex/refs/heads/main/Sample%20Data/Exchange%20Rates/Euro%20to%20USD%20Exchange%20Rates_20231207.csv"
-output_file = os.path.join(output_folder, f"Wind Capex OUT {datetime.today().strftime('%Y-%m-%d')}.csv")
+output_file = os.path.join(output_path, f"Wind Capex OUT {datetime.today().strftime('%Y-%m-%d')}.csv")
 
 # Required columns for validation
 expected_columns = {
@@ -23,9 +23,12 @@ expected_columns = {
 
 # Read exchange rates
 exrates = pd.read_csv(exchange_rates, dtype={
-    'vintage': str, 'country': str,
-    'from_currency': str, 'to_currency': str,
-    'year': str, 'rate_multiplier': float
+    'vintage': str, 
+    'country': str,
+    'from_currency': str, 
+    'to_currency': str,
+    'year': str, 
+    'rate_multiplier': float
 })[['year', 'rate_multiplier']]
 
 # Define transform function
@@ -77,7 +80,7 @@ def process_csv(url):
 
         df['_fact_Asset_Type'] = 'Wind CAPEX'
         df['fact_Dollar_KW'] = df['fact_Dollar_MW'] * 0.001
-        df['fact_Dollar_W'] = df['fact_Dollar_MW'] * 1e-6
+        df['fact_Dollar_W'] = df['fact_Dollar_MW'] * 0.000001
         df['fact_Payment_Date'] = '9/1/2022'
         df['Dimension_PA_Taxonomy_FullQual'] = 'Rotating Equipment>Wind Turbines>Wind Turbines'
         df['fact_Raw_Supplier'] = 'NONE'
@@ -86,7 +89,7 @@ def process_csv(url):
         df['Dimension_Cost_Element_FullQual'] = df['cost_element_category'] + '>' + df['fact_Item']
         df['fact_Euro_MW'] = df['fact_Dollar_MW'] * df['rate_multiplier']
         df['fact_Euro_KW'] = df['fact_Euro_MW'] * 0.001
-        df['fact_Euro_W'] = df['fact_Euro_MW'] * 1e-6
+        df['fact_Euro_W'] = df['fact_Euro_MW'] * 0.000001
 
         return df
 
