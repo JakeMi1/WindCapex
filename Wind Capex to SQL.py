@@ -5,7 +5,6 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
-# -------------------------- CONFIGURATION --------------------------
 input_folder = "F:/un-sorted/Clients/RACM/RAW/Wind CAPEX/NEW"
 exchange_rates = 'F:/un-sorted/Clients/RACM/RAW/Exchange Rates/Euro to USD Exchange Rates_20231207.csv'
 expected_columns = {
@@ -15,24 +14,24 @@ expected_columns = {
     'cost_element_subcategory', 'dollars_per_mw'
 }
 
-# Replace with your SQL connection string
-# Example: "postgresql://user:password@localhost:5432/mydatabase"
+# Replace with SQL connection string
 windcapex_db = "postgresql://username:password@host:port/dbname"
-table_name = "wind_capex_data"
-
-# ------------------------------------------------------------------
+table_name = "wind_capex"
 
 # Set up DB engine
 engine = create_engine(windcapex_db)
 
 # Read exchange rates
 exrates = pd.read_csv(exchange_rates, dtype={
-    'vintage': str, 'country': str,
-    'from_currency': str, 'to_currency': str,
-    'year': str, 'rate_multiplier': float
+    'vintage': str,
+    'country': str,
+    'from_currency': str,
+    'to_currency': str,
+    'year': str, 
+    'rate_multiplier': float
 })[['year', 'rate_multiplier']]
 
-# Define the transformation pipeline
+# Define transform function
 def process_csv(input_file):
     try:
         df = pd.read_csv(input_file)
@@ -81,7 +80,7 @@ def process_csv(input_file):
 
         df['_fact_Asset_Type'] = 'Wind CAPEX'
         df['fact_Dollar_KW'] = df['fact_Dollar_MW'] * 0.001
-        df['fact_Dollar_W'] = df['fact_Dollar_MW'] * 1e-6
+        df['fact_Dollar_W'] = df['fact_Dollar_MW'] * 0.000001
         df['fact_Payment_Date'] = '9/1/2022'
         df['Dimension_PA_Taxonomy_FullQual'] = 'Rotating Equipment>Wind Turbines>Wind Turbines'
         df['fact_Raw_Supplier'] = 'NONE'
@@ -90,7 +89,7 @@ def process_csv(input_file):
         df['Dimension_Cost_Element_FullQual'] = df['cost_element_category'] + '>' + df['fact_Item']
         df['fact_Euro_MW'] = df['fact_Dollar_MW'] * df['rate_multiplier']
         df['fact_Euro_KW'] = df['fact_Euro_MW'] * 0.001
-        df['fact_Euro_W'] = df['fact_Euro_MW'] * 1e-6
+        df['fact_Euro_W'] = df['fact_Euro_MW'] * 0.000001
 
         return df
 
@@ -98,7 +97,7 @@ def process_csv(input_file):
         print(f"❌ Error processing {input_file}: {e}")
         return None
 
-# Process all CSV files
+# Process CSV files
 start_time = datetime.now()
 csv_files = glob.glob(os.path.join(input_folder, '*.csv'))
 all_dfs = []
