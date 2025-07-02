@@ -5,6 +5,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
+# Configuration
 input_folder = "F:/un-sorted/Clients/RACM/RAW/Wind CAPEX/NEW"
 exchange_rates = 'F:/un-sorted/Clients/RACM/RAW/Exchange Rates/Euro to USD Exchange Rates_20231207.csv'
 expected_columns = {
